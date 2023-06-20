@@ -1,7 +1,14 @@
 <template>
   <div class="flex flex-col md:grid md:grid-cols-12 gap-4 mb-2">
-    <div class="md:col-span-7">
-      <EmptyState class="border-none shadow-none">No images</EmptyState>
+    <div class="md:col-span-7 md:flex md:flex-col md:justify-center">
+      <VueperSlides v-if="slides.length" autoplay class="no-shadow">
+        <VueperSlide
+          v-for="(slide, i) in slides"
+          :key="i"
+          :image="slide.image"
+        />
+      </VueperSlides>
+      <EmptyState v-else class="border-none shadow-none">No images</EmptyState>
     </div>
     <div class="flex flex-col justify-between gap-4 md:col-span-5">
       <div class="flex flex-col">
@@ -59,10 +66,20 @@ import ProductDesc from '@/Components/ProductDesc.vue'
 import Price from '@/Components/Price.vue'
 import { Link, useForm } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import { VueperSlides, VueperSlide } from 'vueperslides'
+import 'vueperslides/dist/vueperslides.css'
 
 const props = defineProps({
   product: Object,
+  imgPath: String,
 })
+
+// Populate slides array with product images
+const slides = []
+
+props.product.images.forEach(img => slides.push({'image': window.location.origin + props.imgPath + img.filename}))
+
+console.log(slides)
 
 const isAccessory = computed(
   () => props.product.stocks.length == 1 && !props.product.stocks[0].has_sizes,

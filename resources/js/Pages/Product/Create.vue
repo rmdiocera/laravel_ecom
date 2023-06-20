@@ -80,6 +80,17 @@
               </div>
             </div>
             <button type="button" class="btn-primary w-full" @click="addStock">Add Stock</button>
+            <div>
+              <label class="label">Upload Images</label>
+              <!-- <input type="file" class="border rounded-md file:px-4 file:py-2 border-gray-200 dark:border-gray-700 file:text-gray-700 file:dark:text-gray-400 file:border-0 file:bg-gray-100 file:dark:bg-gray-800 file:font-medium file:hover:bg-gray-200 file:dark:hover:bg-gray-700 file:hover:cursor-pointer file:mr-4" multiple @input="addImages" />
+              <div v-if="addProductForm.errors.brand_id" class="input-error">
+                {{ addProductForm.errors.brand_id }}
+              </div> -->
+              <Uploader
+                server="/temp/upload"
+                @change="changeMedia"
+              />
+            </div>
             <button type="submit" class="btn-primary w-1/4 ml-auto">Save</button>
           </div>
         </div>
@@ -91,12 +102,15 @@
 <script setup>
 import Box from '@/Components/UI/Box.vue'
 import { useForm } from '@inertiajs/vue3'
+import Uploader from 'vue-media-upload'
 
 defineProps({
   categories: Object,
   brands: Object,
   sizes: Object,
 })
+
+let img_arr = []
 
 const addProductForm = useForm({
   name: null,
@@ -108,6 +122,7 @@ const addProductForm = useForm({
     size: '',
     quantity: 0, 
   }],
+  images: [],
 })
 
 const addStock = () => addProductForm.stocks.push({
@@ -115,7 +130,23 @@ const addStock = () => addProductForm.stocks.push({
   quantity: 0,
 })
 
+// const addImages = (event) => {
+//   for (const image of event.target.files) {
+//     addProductForm.images.push(image)
+//   }
+
+//   // console.log(addProductForm.images)
+// }
+
+// Put selected image in img_arr array
+const changeMedia = (media) => {
+  img_arr = media
+}
+
 // const addProduct = () => console.log(addProductForm)
-const addProduct = () =>addProductForm.post(route('products.store'))
+const addProduct = () => {
+  img_arr.forEach(image => addProductForm.images.push(image.name))
+  addProductForm.post(route('products.store'))
+}
 
 </script>

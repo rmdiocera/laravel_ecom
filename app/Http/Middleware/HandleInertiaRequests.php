@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -48,7 +49,8 @@ class HandleInertiaRequests extends Middleware
                 'cartCount' => $request->user()->cart()->where('is_fulfilled', false)->count(),
                 'favoritesCount' => $request->user()->favorites()->count()
                 // 'notificationCount' => $request->user()->unreadNotifications()->count()
-            ] : null
+            ] : null,
+            'category_names' => Category::all()
         ]);
     }
 }

@@ -26,4 +26,20 @@ class Product extends Model
     public function orders() : HasMany {
         return $this->hasMany(Order::class);
     }
+
+    public function images() : HasMany {
+        return $this->hasMany(ProductImages::class);
+    }
+
+    public function scopeFilterProducts($query, $filters) {
+        return $query->when($filters['brand_id'] ?? false, fn($query, $value) => 
+            $query->where('brand_id', $value)
+        )->when($filters['category_id'] ?? false, fn($query, $value) => 
+            $query->where('category_id', $value)
+        )->when($filters['price_from'] ?? false, fn($query, $value) => 
+            $query->where('price', '>=', $value)
+        )->when($filters['price_to'] ?? false, fn($query, $value) => 
+        $query->where('price', '<=', $value)
+        );
+    }
 }
