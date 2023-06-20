@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center">
     <Box class="w-3/4">
-      <template #header>Add New Product</template>
+      <template #header>Edit Product</template>
       <form @submit.prevent="updateProduct">
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-1">Picture</div>
@@ -72,6 +72,20 @@
               </div>
             </div>
             <button type="button" class="btn-primary w-full" @click="addStock">Add Stock</button>
+            <div>
+              <label class="label">Upload Images</label>
+              <!-- <input v-model.number="updateProductForm.price" type="text" class="input" />
+              <div v-if="updateProductForm.errors.price" class="input-error">
+                {{ updateProductForm.errors.price }}
+              </div> -->
+              <Uploader 
+                server="/temp/upload"
+                :media="images.saved"
+                location="/storage/images"
+                @add="addMedia" 
+                @remove="removeMedia"
+              />
+            </div>
             <button type="submit" class="btn-primary w-1/4 ml-auto">Save</button>
           </div>
         </div>
@@ -82,6 +96,7 @@
 
 <script setup>
 import Box from '@/Components/UI/Box.vue'
+import Uploader from 'vue-media-upload'
 import { useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -91,6 +106,16 @@ const props = defineProps({
   sizes: Object,
 })
 
+let images = {
+  saved: [],
+  added: [],
+  removed: [],
+}
+
+for (const image of props.product.images) {
+  images.saved.push({'id': image.id, 'name': image.filename})
+}
+
 const updateProductForm = useForm({
   name: props.product.name,
   description: props.product.description,
@@ -98,6 +123,10 @@ const updateProductForm = useForm({
   brand_id: props.product.brand_id,
   price: props.product.price,
   stocks: [],
+  images: {
+    added: [],
+    removed: [],
+  },
 })
 
 props.product.stocks.forEach(stock => updateProductForm.stocks.push({ size: stock.size, quantity: stock.quantity }))
@@ -107,7 +136,30 @@ const addStock = () => updateProductForm.stocks.push({
   quantity: 0,
 })
 
-// const addProduct = () => console.log(updateProductForm)
-const updateProduct = () =>updateProductForm.put(route('products.update', { product: props.product.id }))
+// Put added images in images.added
+const addMedia = (media) => {
+  images.added.push(media) 
+  console.log(images)
+}
+
+// Put added images in images.removed
+const removeMedia = (media) => {
+  images.removed.push(media)
+  console.log(images)
+} 
+
+// const updateProduct = () => {
+//   // Loop through images.added and images.removed
+//   images.added.forEach(image => updateProductForm.images.added.push(image.name))
+//   images.removed.forEach(image => updateProductForm.images.removed.push({'id': image.id, 'name': image.name}))
+//   console.log(updateProductForm)
+// }
+const updateProduct = () => {
+  // Loop through images.added and images.removed
+  images.added.forEach(image => updateProductForm.images.added.push(image.name))
+  images.removed.forEach(image => updateProductForm.images.removed.push({'id': image.id, 'name': image.name}))
+
+  updateProductForm.put(route('products.update', { product: props.product.id }))
+}
 
 </script>

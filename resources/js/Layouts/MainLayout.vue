@@ -8,8 +8,13 @@
         <div class="flex justify-between items-center gap-16">
           <div class="flex gap-4">
             <Link href="/">New Arrivals</Link>
-            <Link href="/">Shoes</Link>
-            <Link href="/">Accessories</Link>
+            <!-- {{ categories }} -->
+            <Link
+              v-for="category in categories" :key="category.id" 
+              :href="route('products.index') + `/category/${toLowerCase(category.category)}`"
+            >
+              {{ category.category }}
+            </Link>
           </div>
           <div v-if="user" class="flex items-center gap-4">
             <div v-if="user.is_admin">
@@ -73,4 +78,12 @@ const favoritesCount = computed(
     ? usePage().props.user.favoritesCount
     : '9+',
 )
+
+const categories = computed(
+  () => usePage().props.category_names,
+)
+
+// console.log(categories.value)
+
+const toLowerCase = (value) => value.toLowerCase() 
 </script>

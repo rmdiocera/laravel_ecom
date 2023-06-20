@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TempFileUploadController;
 use App\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,8 +30,10 @@ Route::post('login', [AuthController::class, 'store'])->name('login.store');
 Route::delete('logout', [AuthController::class, 'destroy'])->name('logout');
 
 // Products
+Route::get('products/category/{category?}', [ProductController::class, 'index']);
 Route::resource('products', ProductController::class);
-
+Route::name('temp.upload')
+    ->post('temp/upload', TempFileUploadController::class);
 // Cart
 Route::resource('cart', CartController::class)
     ->middleware('auth')

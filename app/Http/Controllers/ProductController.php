@@ -2,21 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
 use App\Models\Size;
+use App\Models\Brand;
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\ProductImages;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, $category = null)
     {
+        $filters = [
+            ...$request->only(['brand_id', 'category_id', 'price_from', 'price_to'])
+        ];
+
+        $products = Product::when($category, function($query, $value) {
+                return $query->where('category_id', $this->getCategory($value));
+        })->filterProducts($filters)
+            ->with('images')  
+            ->get();
+        
         return inertia('Product/Index', [
-            'products' => Product::all()
+            'brands' => Brand::all(),
+            'categories' => $category ? null : Category::all(),
+            'products' => $products,
+            'imgPath' => config('misc.img_path')
         ]);
     }
 
@@ -59,6 +74,16 @@ class ProductController extends Controller
             ])
         );
 
+        if ($request->images) {
+            $request->validate([
+                'media.*' => 'mimes:png,jpg,jpeg|max:5000'
+            ],[
+                'media.*.mimes' => "The file you're uploading should be one of the following formats: .jpg, .png or .jpeg."
+            ]);
+
+            $this->saveImages($request->images, $product);
+        }
+
         foreach (json_decode(json_encode($request->stocks), false) as $stock) {
             $product->stocks()->create([
                 'has_sizes' => $stock->size ? true : false,
@@ -76,7 +101,8 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         return inertia('Product/Show', [
-            'product' => $product->load('stocks')
+            'product' => $product->load('stocks', 'images'),
+            'imgPath' => config('misc.img_path')
         ]);
     }
 
@@ -85,9 +111,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        // dd($product->load('stocks'));
+        // dd($product->load('stocks', 'images'));
         return inertia('Product/Edit', [
-            'product' => $product->load('stocks'),
+            'product' => $product->load('stocks', 'images'),
             'categories' => Category::all(),
             'brands' => Brand::all(),
             'sizes' => Size::all()
@@ -99,6 +125,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        // foreach (json_decode(json_encode($request->images['removed']), false) as $image) {
+        //     return $image->name;
+        // }
         $product->update(
             $request->validate([
                 'name' => 'required',
@@ -121,6 +150,17 @@ class ProductController extends Controller
             ])
         );
 
+        // Check if images->added or images->removed are not empty, else continue
+        if (!empty($request->images['added']) || !empty($request->images['removed'])) {
+            if (!empty($request->images['added'])) {
+                $this->saveImages($product, $request->images['added']);
+            }
+
+            if (!empty($request->images['removed'])) {
+                $this->deleteImages($request->images['removed']);
+            }
+        }
+
         foreach (json_decode(json_encode($request->stocks), false) as $stock) {
             $product->stocks()->updateOrCreate([
                 'size' => $stock->size
@@ -141,5 +181,39 @@ class ProductController extends Controller
         $product->deleteOrFail();
 
         return redirect()->back()->with('success', 'Product deleted successfully.');
+    }
+
+    private function getCategory($category) {
+        switch ($category) {
+            case 'shoes':
+                return 1;
+                break;
+            case 'accessories':
+                return 2;
+                break;
+        }
+    }
+
+    private function saveImages($product, $images) {
+        foreach ($images as $image) {
+            $from = storage_path('app/public/tmp/uploads/' . $image);
+            $to = storage_path('app/public/images/' . $image);
+
+            File::move($from, $to);
+
+            $product->images()->save(new ProductImages([
+                'filename' => $image
+            ]));
+        }
+    }
+
+    private function deleteImages($images) {
+        foreach (json_decode(json_encode($images), false) as $image) {
+            // Find image from DB and delete
+            ProductImages::find($image->id)->delete();
+
+            // Delete image from directory
+            File::delete(storage_path('app/public/images/' . $image->name));
+        }
     }
 }
