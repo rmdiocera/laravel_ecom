@@ -1,8 +1,8 @@
 <template>
-  <Box class="flex flex-col justify-between">
+  <Box class="flex flex-col h-full justify-between">
     <div>
       <div v-if="product_img" class="flex justify-center">
-        <img class="img-rounded" :src="product_img" :alt="product_name" />
+        <img class="img-rounded h-64 w-auto object-scale-down" :src="product_img" :alt="product_name" />
       </div>
       <EmptyState v-else class="h-48 flex items-center justify-center border-none shadow-none mb-2">No images</EmptyState>
     </div>

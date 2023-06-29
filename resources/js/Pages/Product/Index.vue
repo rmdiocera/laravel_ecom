@@ -5,7 +5,7 @@
     </div>
     <div class="col-span-5">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <Product v-for="product in products" :key="product.id" :product="product" :path="imgPath" />
+        <Product v-for="product in products" :key="product.id" class="h-full" :product="product" :path="imgPath" />
       </div>
     </div>
   </div>

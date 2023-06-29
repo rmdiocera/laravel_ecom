@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    public function index() {
-        $favorites = Auth::user()->favorites->load('product');
+    public function index() 
+    {
+        $favorites = Auth::user()->favorites->load('product.images');
         return inertia('Favorite/Index', [
-            'favorites' => $favorites
+            'favorites' => $favorites,
+            'imgPath' => config('misc.img_path')
         ]);
     }
 
@@ -27,5 +29,13 @@ class FavoriteController extends Controller
         ]);
 
         return back()->with('success', 'This item has been added to your favorites.');
+    }
+
+    public function destroy(Favorite $favorite)
+    {
+        // dd($product);
+        $favorite->deleteOrFail();
+
+        return redirect()->back()->with('success', 'Product removed from favorites.');
     }
 }

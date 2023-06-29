@@ -31,6 +31,13 @@ class Product extends Model
         return $this->hasMany(ProductImages::class);
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Product $product) {
+            $product->stocks()->delete();
+        });
+    }
+
     public function scopeFilterProducts($query, $filters) {
         return $query->when($filters['brand_id'] ?? false, fn($query, $value) => 
             $query->where('brand_id', $value)
