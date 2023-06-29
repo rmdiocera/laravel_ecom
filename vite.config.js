@@ -13,6 +13,9 @@ export default defineConfig({
       template: {
         base: null,
         includeAbsolute: false,
+        transformAssetUrls: {
+          includeAbsolute: false,
+        },
       },
     }),
   ],
