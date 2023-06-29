@@ -1,13 +1,19 @@
 <template>
+  <div class="flex items-start mb-4">
+    <a class="btn-primary" onclick="history.back(); return false"><fa-icon icon="fa-solid fa-circle-arrow-left" class="mr-2" />Go Back</a>
+  </div>
   <div class="flex flex-col md:grid md:grid-cols-12 gap-4 mb-2">
-    <div class="md:col-span-7 md:flex md:flex-col md:justify-center">
-      <VueperSlides v-if="slides.length" autoplay class="no-shadow">
+    <div class="md:col-span-7 md:flex md:flex-col md:justify-center h-96 w-auto">
+      <VueperSlides v-if="slides.length > 1" autoplay class="no-shadow" fixed-height="100%">
         <VueperSlide
           v-for="(slide, i) in slides"
           :key="i"
           :image="slide.image"
         />
       </VueperSlides>
+      <div v-else-if="slides.length == 1" class="flex justify-center">
+        <img class="img-rounded h-96 w-auto object-scale-down" :src="slides[0]['image']" :alt="product_name" />
+      </div>
       <EmptyState v-else class="border-none shadow-none">No images</EmptyState>
     </div>
     <div class="flex flex-col justify-between gap-4 md:col-span-5">
@@ -43,8 +49,8 @@
               {{ addToCartForm.errors.size }}
             </div>
             <div class="flex flex-col gap-2 mb-4">
-              <button class="btn-primary w-full" :class="{ 'opacity-25 hover:bg-none': hasStock.length == 0 }" :disabled="hasStock.length == 0" type="submit">{{ hasStock.length > 0 ? 'Add to Cart' : 'Sold Out' }}</button>
-              <Link class="btn-primary w-full" :href="route('products.favorite', { product: product.id, size: addToCartForm.size })" method="POST" as="button">Add to Favorite</Link>
+              <button class="btn-primary w-full" :class="{ 'opacity-25 hover:bg-none': hasStock.length == 0 }" :disabled="hasStock.length == 0" type="submit"><fa-icon icon="fa-solid fa-cart-plus" class="mr-2" />{{ hasStock.length > 0 ? 'Add to Cart' : 'Sold Out' }}</button>
+              <Link class="btn-primary w-full" :href="route('products.favorite', { product: product.id, size: addToCartForm.size })" method="POST" as="button"><fa-icon icon="fa-solid fa-heart" class="mr-2" />Add to Favorite</Link>
             </div>
           </form>
         </div>
@@ -79,7 +85,11 @@ const slides = []
 
 props.product.images.forEach(img => slides.push({'image': window.location.origin + props.imgPath + img.filename}))
 
-console.log(slides)
+// console.log(slides)
+
+const product_name = computed(
+  () => props.product.name,
+)
 
 const isAccessory = computed(
   () => props.product.stocks.length == 1 && !props.product.stocks[0].has_sizes,

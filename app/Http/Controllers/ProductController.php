@@ -135,7 +135,7 @@ class ProductController extends Controller
                 'category_id' => 'required|not_in:0',
                 'brand_id' => 'required|not_in:0',
                 'price' => 'required|integer|min:1|max:1000000',
-                'stocks.*.size' => 'required',
+                'stocks.*.size' => 'required_if:category_id,1',
                 'stocks.*.quantity' => 'required|not_in:0',
                 // 'size' => 'required|not_in:0',
                 // 'quantity' => 'required|integer|min:1|max:10000',

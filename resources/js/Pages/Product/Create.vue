@@ -1,14 +1,13 @@
 <template>
   <div class="flex justify-center">
-    <Box class="w-3/4">
+    <Box class="w-1/3">
       <template #header>Add New Product</template>
       <form @submit.prevent="addProduct">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="col-span-1">Picture</div>
-          <div class="col-span-1 flex flex-col space-y-2">
+        <div class="gap-4">
+          <div class="flex flex-col space-y-2">
             <div>
               <label class="label">Category</label>
-              <select v-model.number="addProductForm.category_id" class="input">
+              <select v-model.number="addProductForm.category_id" class="input" @change="toggleAddStock($event)">
                 <option value="0" selected disabled>
                   Select product's category
                 </option>
@@ -59,8 +58,8 @@
                 <div class="col-span-1">
                   <label class="label">Size</label>
                   <select v-model.number="stock.size" class="input">
-                    <option value="" :selected="true" :disabled="true">Select size</option>
-                    <option v-for="size in sizes" :key="size.id" :value="size.size">{{ size.size }}</option>
+                    <option value="" :selected="true" :disabled="true">{{ addStockButtonDisabled ? 'N/A' : 'Select size' }}</option>
+                    <option v-for="size in sizes" :key="size.id" :hidden="addStockButtonDisabled" :value="size.size">{{ size.size }}</option>
                     <!-- <option value="8">8</option>
                     <option value="8.5">8.5</option>
                     <option value="9">9</option>
@@ -79,7 +78,7 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="btn-primary w-full" @click="addStock">Add Stock</button>
+            <button type="button" class="btn-primary w-full" :hidden="addStockButtonDisabled" @click="addStock">Add Stock</button>
             <div>
               <label class="label">Upload Images</label>
               <!-- <input type="file" class="border rounded-md file:px-4 file:py-2 border-gray-200 dark:border-gray-700 file:text-gray-700 file:dark:text-gray-400 file:border-0 file:bg-gray-100 file:dark:bg-gray-800 file:font-medium file:hover:bg-gray-200 file:dark:hover:bg-gray-700 file:hover:cursor-pointer file:mr-4" multiple @input="addImages" />
@@ -112,6 +111,7 @@ defineProps({
 
 let img_arr = []
 
+let addStockButtonDisabled = false
 const addProductForm = useForm({
   name: null,
   description: null,
@@ -124,6 +124,29 @@ const addProductForm = useForm({
   }],
   images: [],
 })
+
+const toggleAddStock = (event) => {
+  let category_id = event.target.value
+  
+  // Reset stocks array
+  addProductForm.stocks.length = 0
+  // Add default stock input
+  addStock()
+
+  // If selected category is "Shoes"
+  if (category_id == 1) {   
+    // If "Add Stock" button is disabled, enable it
+    if (addStockButtonDisabled) {
+      addStockButtonDisabled = false
+    }
+  // If selected category is "Accessories"
+  } else {
+    // If "Add Stock" button is enabled, disable it
+    if (!addStockButtonDisabled) {
+      addStockButtonDisabled = true
+    }
+  }
+}
 
 const addStock = () => addProductForm.stocks.push({
   size: '',

@@ -41,7 +41,7 @@
           </div>
         </div>
       </div>
-      <button class="btn-primary w-full" type="submit">Filter</button>
+      <button class="btn-primary w-full" type="submit"><fa-icon icon="fa-solid fa-filter" class="mr-2" />Filter</button>
     </div>
   </form>
 </template>

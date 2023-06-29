@@ -3,11 +3,11 @@
     <div class="container mx-auto w-full">
       <nav class="p-4 flex items-center justify-between">
         <div>
-          <Link :href="route('products.index')" class="font-ubuntu text-4xl">🌊 Dripp</Link>
+          <Link :href="route('index')" class="font-ubuntu text-4xl">🌊 Dripp</Link>
         </div>
         <div class="flex justify-between items-center gap-16">
           <div class="flex gap-4">
-            <Link href="/">New Arrivals</Link>
+            <!-- <Link href="/">New Arrivals</Link> -->
             <!-- {{ categories }} -->
             <Link
               v-for="category in categories" :key="category.id" 
@@ -16,9 +16,11 @@
               {{ category.category }}
             </Link>
           </div>
+        </div>
+        <div class="flex justify-between items-center gap-16">
           <div v-if="user" class="flex items-center gap-4">
             <div v-if="user.is_admin">
-              <Link :href="route('products.create')" class="btn-primary">Add New Product</Link>
+              <Link :href="route('products.create')" class="btn-primary"><fa-icon icon="fa-solid fa-circle-plus" class="mr-2" />Add New Product</Link>
             </div>
             <div v-else>
               <Link :href="route('favorites.index')" class="text-gray-500 relative pr-2 py-2 text-lg">

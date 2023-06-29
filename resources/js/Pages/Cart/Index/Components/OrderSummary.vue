@@ -9,7 +9,8 @@
     <div class="px-4">
       <!-- <Link class="btn-primary w-full" method="POST" as="button">Checkout</Link> -->
       <Link href="#!" class="btn-primary w-full" as="button" @click="openCheckout">
-        Buy
+        <fa-icon icon="fa-solid fa-credit-card" class="mr-2" />
+        Checkout
       </Link>
     </div>
   </div>
@@ -18,6 +19,7 @@
 <script setup>
 import Price from '@/Components/Price.vue'
 import { Link, useForm } from '@inertiajs/vue3'
+import { computed } from 'vue'
 
 
 const props = defineProps({
@@ -31,8 +33,12 @@ const props = defineProps({
 // )
 // console.log(props)
 
+const cart_total = computed(
+  () => props.total,
+)
+
 const cartForm = useForm({
-  amount: props.total,
+  amount: cart_total,
 })
 
 function checkoutComplete() {

@@ -19,6 +19,11 @@
         "vue": "^3.2.47"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.4.0",
+        "@fortawesome/free-brands-svg-icons": "^6.4.0",
+        "@fortawesome/free-regular-svg-icons": "^6.4.0",
+        "@fortawesome/free-solid-svg-icons": "^6.4.0",
+        "@fortawesome/vue-fontawesome": "^3.0.3",
         "@inertiajs/vue3": "^1.0.2",
         "vue-media-upload": "^2.1.2",
         "vueperslides": "^3.5.1"

@@ -1,11 +1,10 @@
 <template>
   <div class="flex justify-center">
-    <Box class="w-3/4">
+    <Box class="w-1/3">
       <template #header>Edit Product</template>
       <form @submit.prevent="updateProduct">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="col-span-1">Picture</div>
-          <div class="col-span-1 flex flex-col space-y-2">
+        <div class="gap-4">
+          <div class="flex flex-col space-y-2">
             <div>
               <label class="label">Category</label>
               <select v-model.number="updateProductForm.category_id" class="input" disabled>
@@ -50,9 +49,9 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-1">
                   <label class="label">Size</label>
-                  <select v-model.number="stock.size" class="input">
-                    <option value="" :selected="true" :disabled="true">Select size</option>
-                    <option v-for="size in sizes" :key="size.id" :value="size.size">{{ size.size }}</option>
+                  <select v-model.number="stock.size" :disabled="addStockButtonDisabled" class="input">
+                    <option value="">N/A</option>
+                    <option v-for="size in sizes" :key="size.id" :hidden="addStockButtonDisabled" :value="size.size">{{ size.size }}</option>
                     <!-- <option value="8">8</option>
                     <option value="8.5">8.5</option>
                     <option value="9">9</option>
@@ -71,7 +70,7 @@
                 </div>
               </div>
             </div>
-            <button type="button" class="btn-primary w-full" @click="addStock">Add Stock</button>
+            <button type="button" class="btn-primary w-full" :hidden="addStockButtonDisabled" @click="addStock">Add Stock</button>
             <div>
               <label class="label">Upload Images</label>
               <!-- <input v-model.number="updateProductForm.price" type="text" class="input" />
@@ -106,6 +105,7 @@ const props = defineProps({
   sizes: Object,
 })
 
+let addStockButtonDisabled = props.product.category_id == 2 ?? false
 let images = {
   saved: [],
   added: [],
@@ -129,7 +129,7 @@ const updateProductForm = useForm({
   },
 })
 
-props.product.stocks.forEach(stock => updateProductForm.stocks.push({ size: stock.size, quantity: stock.quantity }))
+props.product.stocks.forEach(stock => updateProductForm.stocks.push({ size: stock.size == null ? '' : stock.size, quantity: stock.quantity }))
 
 const addStock = () => updateProductForm.stocks.push({
   size: '',
