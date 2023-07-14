@@ -194,7 +194,7 @@ class ProductController extends Controller
         }
     }
 
-    private function saveImages($product, $images) {
+    private function saveImages($images, $product) {
         foreach ($images as $image) {
             $from = storage_path('app/public/tmp/uploads/' . $image);
             $to = storage_path('app/public/images/' . $image);
