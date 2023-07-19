@@ -153,7 +153,7 @@ class ProductController extends Controller
         // Check if images->added or images->removed are not empty, else continue
         if (!empty($request->images['added']) || !empty($request->images['removed'])) {
             if (!empty($request->images['added'])) {
-                $this->saveImages($product, $request->images['added']);
+                $this->saveImages($request->images['added'], $product);
             }
 
             if (!empty($request->images['removed'])) {
