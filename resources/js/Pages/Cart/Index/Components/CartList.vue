@@ -14,7 +14,7 @@
             <!-- <input id="input-qty" v-model.number="orderInfo.quantity" type="number" min="1" :data-old-qty="item.quantity" @change="test($event)" /> -->
           </span>
           <div class="flex flex-row h-8 w-24 rounded-lg relative bg-transparent input-counter">
-            <button data-action="decrement" class=" bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer outline-none" @click="decrement">
+            <button data-action="decrement" class=" bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer outline-none" :disabled="orderInfo.quantity == 0" @click="decrement">
               -
             <!-- <span class="m-auto text-2xl font-thin">−</span> -->
             </button>
@@ -65,7 +65,6 @@ function decrement(e) {
     'button[data-action="decrement"]',
   )
   const target = btn.nextElementSibling
-  // console.log(target)
   let value = Number(target.value)
   value--
   orderInfo.quantity--
@@ -78,7 +77,6 @@ function increment(e) {
     'button[data-action="decrement"]',
   )
   const target = btn.nextElementSibling
-  // console.log(target)
   let value = Number(target.value)
   value++
   orderInfo.quantity++
@@ -86,16 +84,9 @@ function increment(e) {
   test(e, 'add')
 }
 
-const test = debounce((event, change) => test_func(event, change), 200)
-
-// if (change == 'add') {
-//     console.log(event.target.previousSibling)
-//   } else if (change == 'reduce') {
-//     console.log(event.target.nextSibling)
-//   }
+const test = debounce((event, change) => test_func(event, change), 1000)
 
 const test_func = (event, change) => {
-  // console.log(event.target.previousSibling.getAttribute('data-old-qty'))
   let old_qty = 0
 
   if (change == 'add') {
@@ -107,19 +98,6 @@ const test_func = (event, change) => {
   }
 
   orderInfo.change = change
-
-  // let old_qty = Number(event.target.getAttribute('data-old-qty'))
-  // if (old_qty < orderInfo.quantity) {
-  //   orderInfo.change = 'add'
-  //   orderInfo.difference = orderInfo.quantity - old_qty
-  // } else if (old_qty == orderInfo.quantity) {
-  //   orderInfo.change = ''
-  // } else {
-  //   orderInfo.change = 'reduce'
-  //   orderInfo.difference = old_qty - orderInfo.quantity 
-  // }
-  
-  // console.log(orderInfo.quantity, old_qty, orderInfo.change)
     
   orderInfo.put(
     route('cart.update', {
@@ -131,15 +109,17 @@ const test_func = (event, change) => {
     {
       preserveState: true,
       preserveScroll: true,
-      onSuccess: () => {
-        // let input_qty = document.getElementById('input-qty')
+      onSuccess: (res) => {
+        const items = Object.values(res.props.cart)
+        items.forEach(item => {
+          if (item.quantity == 0) {
+            orderInfo.delete(route('cart.destroy', {cart: item.id}))
+          }
+        })
+
         if (change == 'add') {
-          // old_qty = Number(event.target.previousSibling.getAttribute('data-old-qty'))
-          // orderInfo.difference = orderInfo.quantity - old_qty
           event.target.previousSibling.setAttribute('data-old-qty', orderInfo.quantity)
         } else if (change == 'reduce') {
-          // old_qty = Number(event.target.nextSibling.getAttribute('data-old-qty'))
-          // orderInfo.difference = old_qty - orderInfo.quantity
           event.target.nextSibling.setAttribute('data-old-qty', orderInfo.quantity)
         }
       },
@@ -149,11 +129,6 @@ const test_func = (event, change) => {
     },
   )
 }
-
-// watch(
-//   () => props.item.quantity,
-//   (qty) => console.log(qty),
-// )
 
 </script>
 
